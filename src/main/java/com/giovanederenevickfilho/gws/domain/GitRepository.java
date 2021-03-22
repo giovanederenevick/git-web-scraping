@@ -1,54 +1,56 @@
 package com.giovanederenevickfilho.gws.domain;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class GitRepository implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private String fileExtension;
-	private Integer countLines;
-	private Integer countBytes;
+	private String gitUsername;
+	private String gitRepositoryName;
+	private List<GitRepositoryDetails> gitRepositoryDetails;
 	
 	public GitRepository() {
 	}
 
-	public GitRepository(String fileExtension, Integer countLines, Integer countBytes) {
+	public GitRepository(String gitUsername, String gitRepositoryName, List<GitRepositoryDetails> gitRepositoryDetails) {
 		super();
-		this.fileExtension = fileExtension;
-		this.countLines = countLines;
-		this.countBytes = countBytes;
+		this.gitUsername = gitUsername;
+		this.gitRepositoryName = gitRepositoryName;
+		this.gitRepositoryDetails = gitRepositoryDetails;
 	}
 
-	public String getFileExtension() {
-		return fileExtension;
+	public String getGitUsername() {
+		return gitUsername;
 	}
 
-	public void setFileExtension(String fileExtension) {
-		this.fileExtension = fileExtension;
+	public void setGitUsername(String gitUsername) {
+		this.gitUsername = gitUsername;
 	}
 
-	public Integer getCountLines() {
-		return countLines;
+	public String getGitRepositoryName() {
+		return gitRepositoryName;
 	}
 
-	public void setCountLines(Integer countLines) {
-		this.countLines = countLines;
+	public void setGitRepositoryName(String gitRepositoryName) {
+		this.gitRepositoryName = gitRepositoryName;
 	}
 
-	public Integer getCountBytes() {
-		return countBytes;
+	public List<GitRepositoryDetails> getGitRepositoryDetails() {
+		return gitRepositoryDetails;
 	}
 
-	public void setCountBytes(Integer countBytes) {
-		this.countBytes = countBytes;
+	public void setGitRepositoryDetails(List<GitRepositoryDetails> gitRepositoryDetails) {
+		this.gitRepositoryDetails = gitRepositoryDetails;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((fileExtension == null) ? 0 : fileExtension.hashCode());
+		result = prime * result + ((gitRepositoryName == null) ? 0 : gitRepositoryName.hashCode());
+		result = prime * result + ((gitUsername == null) ? 0 : gitUsername.hashCode());
 		return result;
 	}
 
@@ -61,10 +63,15 @@ public class GitRepository implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		GitRepository other = (GitRepository) obj;
-		if (fileExtension == null) {
-			if (other.fileExtension != null)
+		if (gitRepositoryName == null) {
+			if (other.gitRepositoryName != null)
 				return false;
-		} else if (!fileExtension.equals(other.fileExtension))
+		} else if (!gitRepositoryName.equals(other.gitRepositoryName))
+			return false;
+		if (gitUsername == null) {
+			if (other.gitUsername != null)
+				return false;
+		} else if (!gitUsername.equals(other.gitUsername))
 			return false;
 		return true;
 	}

@@ -9,5 +9,4 @@ public class GitWebScrapingApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(GitWebScrapingApplication.class, args);
 	}
-
 }
