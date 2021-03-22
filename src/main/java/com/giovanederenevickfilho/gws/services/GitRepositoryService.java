@@ -26,7 +26,7 @@ public class GitRepositoryService {
 	
 	private Document doc;
 	
-	private void listAllLinks(String url) throws IOException {
+	private void listAllLinks(String url) throws IOException {		
 		try {
 			doc = Jsoup.connect(GIT_HUB_URL + url).get();
 		} catch (HttpStatusException e) {
@@ -35,6 +35,7 @@ public class GitRepositoryService {
 		}
 		
 		Elements elements = doc.getElementsByClass("js-navigation-open Link--primary");
+		
 		for (Element element : elements) {
 			String link = element.attributes().get("href");
 			String extension = getExtensionFromHref(link);
@@ -77,8 +78,14 @@ public class GitRepositoryService {
 		}
 	}
 
+	private void cleanDb() {
+		
+		repo.deleteAll();
+	}
+
 	public GitRepository listAll(String gitUser, String userRepository){		
 		try {
+			cleanDb();
 			
 			listAllLinks("/" + gitUser + "/" + userRepository);
 
@@ -95,7 +102,7 @@ public class GitRepositoryService {
 		return null;
 	}
 	
-	private String getExtensionFromHref(String link) {
+	public String getExtensionFromHref(String link) {
 		
 		String[] linkFormatted = link.split("/");
 		String[] extension = linkFormatted[linkFormatted.length - 1].split("\\.");

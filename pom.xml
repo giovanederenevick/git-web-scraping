@@ -64,6 +64,11 @@
 		    <groupId>mysql</groupId> 
 		    <artifactId>mysql-connector-java</artifactId> 
 		</dependency>
+		
+		<dependency>
+	  		<groupId>junit</groupId>
+	  		<artifactId>junit</artifactId>
+	  		</dependency>
 	</dependencies>
 
 	<build>
@@ -72,6 +77,14 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <configuration>
+		            <source>11</source> 
+		            <target>11</target>
+		        </configuration>
+		    </plugin>
 		</plugins>
 	</build>
 
