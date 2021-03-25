@@ -3,8 +3,6 @@ package com.giovanederenevickfilho.gws.services;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.giovanederenevickfilho.gws.domain.GitRepository;
 import com.giovanederenevickfilho.gws.domain.GitRepositoryDetails;
 import com.giovanederenevickfilho.gws.repositories.GitRepositoryDetailsRepository;
+import com.giovanederenevickfilho.gws.utis.WebScrapingUtils;
 
 @Service
 public class GitRepositoryService {
@@ -24,26 +23,11 @@ public class GitRepositoryService {
 	@Autowired
 	GitRepositoryDetailsRepository repo;
 	
-	private static final String GIT_HUB_URL = "https://github.com";
-	
-	private static final String FILE_INFO = "^(?<lines>\\d{0,})\\s"
-			+ ".{0,}\\s"
-			+ ".{0,}\\s"
-			+ ".{0,}\\s" 
-			+ "(?<bytes>.{0,})\\s"
-			+ "(?<size>.{1,})";
-	
-	private static final Pattern PATTERN_FILE_INFO;
-	
-	static {
-		PATTERN_FILE_INFO = Pattern.compile(FILE_INFO);
-	}
-	
 	private Document doc;
 	
 	private void listAllLinks(String url) throws IOException {		
 		try {
-			doc = Jsoup.connect(GIT_HUB_URL + url).get();
+			doc = Jsoup.connect(WebScrapingUtils.getGitHubUrl() + url).get();
 		} catch (HttpStatusException e) {
 			e.printStackTrace();
 			return;
@@ -54,27 +38,13 @@ public class GitRepositoryService {
 		for (Element element : elements) {
 			String link = element.attributes().get("href");
 			String extension = getExtensionFromHref(link);
-			if(extension != null && !"jar".equalsIgnoreCase(extension)) {
-				
-				doc = Jsoup.connect(GIT_HUB_URL + link).get();
+			if(extension != null) {
+				doc = Jsoup.connect(WebScrapingUtils.getGitHubUrl() + link).get();
 				Elements elementsFile = doc.getElementsByClass("text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0");
 				for (Element elementFile : elementsFile) {
-					Long countLines = 0L;
-					Double countBytes = 0D;
-					
-					Matcher m = PATTERN_FILE_INFO.matcher(elementFile.text());
-					
-					if(m.matches()) {
-						countLines = Long.parseLong(m.group("lines"));
-						countBytes = Double.parseDouble(m.group("bytes"));
-						if("KB".equalsIgnoreCase(m.group("size"))) {
-							countBytes *= 1024;
-						}
-						if("MB".equalsIgnoreCase(m.group("size"))) {
-							countBytes *= 1024*1024;
-						}
-					}
-					
+					Long countLines = WebScrapingUtils.getCountLines(elementFile.text());
+					Double countBytes = WebScrapingUtils.getCountBytes(elementFile.text());;
+										
 					GitRepositoryDetails grd = find(extension);
 					if(grd == null) {
 						GitRepositoryDetails newGrd = new GitRepositoryDetails(extension, countLines, countBytes);
@@ -85,7 +55,7 @@ public class GitRepositoryService {
 						repo.save(grd);
 					}
 				}
-			} else if (extension == null && !"jar".equalsIgnoreCase(extension)) {
+			} else {
 				listAllLinks(link);
 			}
 		}
