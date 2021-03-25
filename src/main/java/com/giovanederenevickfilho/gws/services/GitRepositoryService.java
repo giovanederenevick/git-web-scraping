@@ -3,6 +3,8 @@ package com.giovanederenevickfilho.gws.services;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -23,6 +25,19 @@ public class GitRepositoryService {
 	GitRepositoryDetailsRepository repo;
 	
 	private static final String GIT_HUB_URL = "https://github.com";
+	
+	private static final String FILE_INFO = "^(?<lines>\\d{0,})\\s"
+			+ ".{0,}\\s"
+			+ ".{0,}\\s"
+			+ ".{0,}\\s" 
+			+ "(?<bytes>.{0,})\\s"
+			+ "(?<size>.{1,})";
+	
+	private static final Pattern PATTERN_FILE_INFO;
+	
+	static {
+		PATTERN_FILE_INFO = Pattern.compile(FILE_INFO);
+	}
 	
 	private Document doc;
 	
@@ -47,19 +62,17 @@ public class GitRepositoryService {
 					Long countLines = 0L;
 					Double countBytes = 0D;
 					
-					String[] lineFormattedLines = elementFile.text().split(" lines");
-					countLines = Long.parseLong(lineFormattedLines[0]);
+					Matcher m = PATTERN_FILE_INFO.matcher(elementFile.text());
 					
-					String[] linkFormattedBytes = elementFile.text().split("sloc\\) ");
-					String[] byteCountFormatted = linkFormattedBytes[1].split("\\s");
-					if(byteCountFormatted[1].equals("Bytes")) {
-						countBytes = Double.parseDouble(byteCountFormatted[0]);
-					}
-					if(byteCountFormatted[1].equals("KB")) {
-						countBytes = Double.parseDouble(byteCountFormatted[0])*1024;
-					}
-					if(byteCountFormatted[1].equals("MB")) {
-						countBytes = Double.parseDouble(byteCountFormatted[0])*1024*1024;
+					if(m.matches()) {
+						countLines = Long.parseLong(m.group("lines"));
+						countBytes = Double.parseDouble(m.group("bytes"));
+						if("KB".equalsIgnoreCase(m.group("size"))) {
+							countBytes *= 1024;
+						}
+						if("MB".equalsIgnoreCase(m.group("size"))) {
+							countBytes *= 1024*1024;
+						}
 					}
 					
 					GitRepositoryDetails grd = find(extension);
