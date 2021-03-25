@@ -25,13 +25,9 @@ public class GitRepositoryService {
 	
 	private Document doc;
 	
-	private void listAllLinks(String url) throws IOException {		
-		try {
-			doc = Jsoup.connect(WebScrapingUtils.getGitHubUrl() + url).get();
-		} catch (HttpStatusException e) {
-			e.printStackTrace();
-			return;
-		}
+	private void listAllLinks(String url) throws IOException, HttpStatusException {		
+		
+		doc = Jsoup.connect(WebScrapingUtils.getGitHubUrl() + url).get();
 		
 		Elements elements = doc.getElementsByClass("js-navigation-open Link--primary");
 		
@@ -66,23 +62,17 @@ public class GitRepositoryService {
 		repo.deleteAll();
 	}
 
-	public GitRepository listAll(String gitUser, String userRepository){		
-		try {
-			cleanDb();
+	public GitRepository listAll(String gitUser, String userRepository) throws IOException, HttpStatusException{		
 			
-			listAllLinks("/" + gitUser + "/" + userRepository);
+		cleanDb();
+			
+		listAllLinks("/" + gitUser + "/" + userRepository);
 
-			List<GitRepositoryDetails> listGrd = repo.findAll();
-			
-			GitRepository gr = new GitRepository(gitUser, userRepository, listGrd);
-			
-			return gr;
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		List<GitRepositoryDetails> listGrd = repo.findAll();
 		
-		return null;
+		GitRepository gr = new GitRepository(gitUser, userRepository, listGrd);
+		
+		return gr;
 	}
 	
 	public String getExtensionFromHref(String link) {
